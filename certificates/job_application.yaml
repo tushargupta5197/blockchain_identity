@@ -1,0 +1,8 @@
+Name: Job Application
+Attributes:
+{
+  first_name: Alice,
+  last_name: Garcia,
+  employee_status: employed,
+  salary: 50000
+}

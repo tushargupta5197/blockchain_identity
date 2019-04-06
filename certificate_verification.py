@@ -5,10 +5,11 @@ import datetime
 # Initialization of blockchain
 issuers = ["birth", "passport_office"]
 pkey_dic = {}
+skey_dic = {}
 keypair_dic = {}
 for issuer in issuers:
-	keypair = rsa.newkeys(512)
-	keypair_dic[issuer] = keypair
+	keypair = rsa.newkeys(1024)
+	skey_dic[issuer] = keypair[1]
 	pkey_dic[issuer] = keypair[0]
 
 merkle_signatures = []
@@ -55,10 +56,21 @@ class Certificate:
 		index = self.fields_list.index(statement)
 		return self.merkleTree.get_proof(index)
 
+	def uploadMerkleSignature(self):
+		root = self.getMerkleRoot()
+		issuer_skey = skey_dic[self.issuer]
+		encrypted_root = rsa.sign(root, issuer_skey, 'SHA-256')
+		merkle_signatures.append(encrypted_root)
+		return merkle_signatures.index(encrypted_root)
+
+	def verifySignature(self, root, pkey, encrypted):
+		decrypted = rsa.verify(root, encrypted, pkey)
+		return decrypted=='SHA-256'
+
 	# def signAndUploadMerkleRoot()
 
 
-bc = Certificate("Birth Certificate", "Govt", "Bob", birth_certificate)
+bc = Certificate(name = "Birth Certificate", issuer = "birth", receiver = "Bob", fields = birth_certificate)
 bc.makeMerkleTree()
 root = (bc.getMerkleRoot())
 leaf = (bc.getMerkleLeaf('mother','Chunni Lal'))
@@ -67,3 +79,9 @@ print(root)
 print(leaf)
 print(proof)
 print(bc.merkleTree.validate_proof(proof, leaf, root))
+# bc.uploadMerkleSignature()
+index = bc.uploadMerkleSignature()
+print(bc.verifySignature(root, pkey_dic[bc.issuer], merkle_signatures[index]))
+
+# signature = rsa.sign(root, skey_dic['birth'], 'SHA-256')
+# print(rsa.verify(root, signature, pkey_dic['birth']))
