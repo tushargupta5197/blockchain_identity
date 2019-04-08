@@ -12,4 +12,4 @@ class User:
 			self.keypair = keypair
 
 
-	def requestCerti(self, )
+	def requestCerti(self)
