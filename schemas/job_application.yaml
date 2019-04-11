@@ -1,4 +1,5 @@
 Name: Job Application
 Attributes: [first_name, last_name, employee_status, salary]
 Proof_Request: [first_name, last_name, phone_number, ssn, degree, status]
-Verifiable: [degree, status, ssn]
+Verifiable: {degree: ABC University, status: ABC University, ssn: ABC University}
+# Verifiable_Issuers: {degree: }

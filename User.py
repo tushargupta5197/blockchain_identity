@@ -1,4 +1,5 @@
 import rsa
+import globalVs
 
 
 class User:
@@ -12,4 +13,7 @@ class User:
 			self.keypair = keypair
 
 
-	def requestCerti(self)
+	def requestCertificate(self, issuer, values = None):
+		schema = globalVs.CertiName[issuer]
+		proof = {}
+		

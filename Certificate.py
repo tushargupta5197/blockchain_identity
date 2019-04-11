@@ -1,7 +1,7 @@
 import rsa
 from merkletools import *
 import datetime
-
+import globalVs
 
 
 class Certificate:
@@ -41,8 +41,8 @@ class Certificate:
 		root = self.getMerkleRoot()
 		issuer_skey = skey_dic[self.issuer]
 		encrypted_root = rsa.sign(root, issuer_skey, 'SHA-256')
-		merkle_signatures.append(encrypted_root)
-		return merkle_signatures.index(encrypted_root)
+		globalVs.merkle_signatures.append(encrypted_root)
+		return globalVs.merkle_signatures.index(encrypted_root)
 
 	def verifySignature(self, root, pkey, encrypted):
 		decrypted = rsa.verify(root, encrypted, pkey)

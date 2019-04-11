@@ -11,6 +11,7 @@ class Issuer:
 			self.keypair = rsa.newkeys(1024)
 		else:
 			self.keypair = keypair
+		globalVs.public_keys[self.name] = self.keypair[0]
 
 		self.schema = yaml.load(open(schema))
 
@@ -28,19 +29,25 @@ class Issuer:
 
 	#proofs : dictionary of field and proof
 	#values : dictionary of field and values
-	def issue(self, proofs, values, Upubkey):
+	def issue(self, proofs, values):
 		
 		for attr in self.schema['Proof_Request']:
 			if attr not in values:
 				print("Value not provided: "+attr)
 				return False
 
-		for attr in self.schema['Verifiable']:
+		for attr in self.schema['Verifiable'].keys():
 			if attr not in proofs:
 				print("Proof not provided: "+attr)
 				return False
 
-			if(!self.verify_field(key = attr, value = values[attr])):
+			if(!self.verify_field(key = attr, 
+								value = values[attr], 
+								signature = globalVs.merkle_signatures[int(proofs['address'])], 
+								root = proofs[root], 
+								pkey = globalVs.public_keys[self.schema['Verifiable'][attr]]
+								)
+			):
 				print("Proof Verification Failed: "+attr)
 				return False
 
@@ -49,11 +56,14 @@ class Issuer:
 			if attr in values:
 				fields[attr]=values[attr]
 			else:
-				fields[attr]=1 #Will be replaced with random quantity
+				fields[attr]=str(1)#raw_input(attr+': ') #Will be replaced with random quantity
 
 
 		newCertificate = Certificate(name=globalVs.CertiName[self.name], issuer = self.name, receiver=Upubkey, fields = fields)
 		# Insert into bloackchain, return the address
+
+		newCertificate.makeMerkleTree()
+		address = newCertificate.uploadMerkleSignature()
 		
 
 

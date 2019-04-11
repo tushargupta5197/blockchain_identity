@@ -1,5 +1,3 @@
-
-
 def init():
 	global issuers
 	issuers = ['Passport_Office', 'ABC University', 'XYZ Company']
@@ -9,7 +7,13 @@ def init():
 
 	global CertiName
 	CertiName = {
-		'Passport_Office' : 'Passport',
-		'ABC University' : 'Transcript',
-		'XYZ Company' : 'Job_Certificate',
+		'Passport_Office' : 'passport',
+		'ABC University' : 'transcript',
+		'XYZ Company' : 'job_certificate',
 	}
+
+	global merkle_signatures
+	merkle_signatures = []
+
+	global public_keys
+	public_keys = {}
