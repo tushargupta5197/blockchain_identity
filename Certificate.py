@@ -6,7 +6,7 @@ import yaml
 
 
 class Certificate:
-	def __init__(self, name, issuer, receiver, fields, address = 0x0):
+	def __init__(self, name=None, issuer=None, receiver=None, fields=None, address = 0x0):
 		self.name = name
 		self.issuer = issuer
 		self.receiver = receiver
@@ -16,10 +16,11 @@ class Certificate:
 		self.merkleTree = None
 		self.merkleSigAdd = None
 
-		for key in fields:
-			self.fields_list.append(str(key) + ':' + str(self.fields[key]))
+		if fields:
+			for key in fields:
+				self.fields_list.append(str(key) + ':' + str(self.fields[key]))
 
-	def __init__(self, filename):
+	def load_from_file(self, filename):
 		cert = yaml.load(open(filename))
 		self.name = cert['Name']
 		self.issuer = cert['Issuer']
@@ -30,8 +31,9 @@ class Certificate:
 		self.merkleTree = None
 		self.merkleSigAdd = None
 
-		for key in fields:
-			self.fields_list.append(str(key) + ':' + str(self.fields[key]))
+		if self.fields:
+			for key in self.fields:
+				self.fields_list.append(str(key) + ':' + str(self.fields[key]))
 
 	def makeMerkleTree(self):
 		self.merkleTree = MerkleTools()

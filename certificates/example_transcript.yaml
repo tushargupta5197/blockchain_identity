@@ -1,0 +1,11 @@
+Name: transcript
+Issuer: ABC University
+Receiver: Alice Garcia
+Attributes: {
+  student_name: Alice Garcia,
+  ssn: 123-456-789,
+  degree: B.Tech,
+  year: 2009,
+  status: graduated
+}
+Address: 0x1234

@@ -1,15 +1,15 @@
 def init():
 	global issuers
-	issuers = ['Passport_Office', 'ABC University', 'XYZ Company']
+	issuers = ['SBI bank', 'ABC University', 'XYZ Company']
 
 	global users
-	users = ['tg', 'kumar', 'mkant', 'baba', 'khetan']
+	users = ['alice']
 
 	global CertiName
 	CertiName = {
-		'Passport_Office' : 'passport',
 		'ABC University' : 'transcript',
-		'XYZ Company' : 'job_certificate',
+		'XYZ Company' : 'job_application',
+		'SBI bank' : 'loan',
 	}
 
 	global merkle_signatures
@@ -17,3 +17,7 @@ def init():
 
 	global public_keys
 	public_keys = {}
+
+
+def save():
+	pass

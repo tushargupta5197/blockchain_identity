@@ -1,11 +1,1 @@
-Name: transcript
-Issuer: ABC University
-Receiver: Alice Garcia
-Attributes: {
-  student_name: Alice Garcia,
-  ssn: 123-456-789,
-  degree: B.Tech,
-  year: 2009,
-  status: graduated
-}
-Address: 0x1234
+{"Attributes": {"status": "graduated", "first_name": "alice", "last_name": "garcia", "degree": "Btech", "ssn": 150035, "year": 2015}, "Address": 0, "Receiver": "alice", "Name": "transcript", "Issuer": "ABC University"}

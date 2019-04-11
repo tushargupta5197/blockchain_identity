@@ -1,4 +1,4 @@
 Name: Transcript
-Attributes: [student_name, ssn, degree, year, status]
+Attributes: [first_name, last_name, ssn, degree, year, status]
 Proof_Request: null
 Verifiable: null
