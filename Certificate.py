@@ -2,6 +2,7 @@ import rsa
 from merkletools import *
 import datetime
 import globalVs
+import yaml
 
 
 class Certificate:
@@ -12,6 +13,20 @@ class Certificate:
 		self.fields = fields
 		self.fields_list = []
 		self.address = address
+		self.merkleTree = None
+		self.merkleSigAdd = None
+
+		for key in fields:
+			self.fields_list.append(str(key) + ':' + str(self.fields[key]))
+
+	def __init__(self, filename):
+		cert = yaml.load(open(filename))
+		self.name = cert['Name']
+		self.issuer = cert['Issuer']
+		self.receiver = cert['Receiver']
+		self.fields = cert['Attributes']
+		self.fields_list = []
+		self.address = cert['Address']
 		self.merkleTree = None
 		self.merkleSigAdd = None
 
@@ -37,9 +52,8 @@ class Certificate:
 		index = self.fields_list.index(statement)
 		return self.merkleTree.get_proof(index)
 
-	def uploadMerkleSignature(self):
+	def uploadMerkleSignature(self, issuer_skey):
 		root = self.getMerkleRoot()
-		issuer_skey = skey_dic[self.issuer]
 		encrypted_root = rsa.sign(root, issuer_skey, 'SHA-256')
 		globalVs.merkle_signatures.append(encrypted_root)
 		return globalVs.merkle_signatures.index(encrypted_root)

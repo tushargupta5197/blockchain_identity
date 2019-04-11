@@ -1,4 +1,6 @@
 Name: Job Application
+Issuer: ABC Company
+Receiver: Alice Garcia
 Attributes:
 {
   first_name: Alice,
@@ -6,3 +8,4 @@ Attributes:
   employee_status: employed,
   salary: 50000
 }
+Address: 0x1234

@@ -3,6 +3,7 @@ import yaml
 from merkletools import *
 from hashlib import sha256
 import globalVs
+import json
 
 class Issuer:
 	def __init__(self, name = None, keypair = None, schema = None):
@@ -29,7 +30,19 @@ class Issuer:
 
 	#proofs : dictionary of field and proof
 	#values : dictionary of field and values
-	def issue(self, proofs, values):
+
+	def construct_cert_str(name, receiver, attr, address):
+		return json.dumps(
+			{
+				'Name':name,
+				'Issuer': self.name,
+				'Receiver': receiver,
+				'Attributes': attr,
+				'Address': address
+			}
+		)
+
+	def issue(self, proofs, values, receiver):
 		
 		for attr in self.schema['Proof_Request']:
 			if attr not in values:
@@ -43,8 +56,9 @@ class Issuer:
 
 			if(!self.verify_field(key = attr, 
 								value = values[attr], 
-								signature = globalVs.merkle_signatures[int(proofs['address'])], 
-								root = proofs[root], 
+								signature = globalVs.merkle_signatures[int(proofs[attr]['address'])], 
+								root = proofs[attr]['root'], 
+								proof = proofs[attr]['proof']
 								pkey = globalVs.public_keys[self.schema['Verifiable'][attr]]
 								)
 			):
@@ -59,11 +73,13 @@ class Issuer:
 				fields[attr]=str(1)#raw_input(attr+': ') #Will be replaced with random quantity
 
 
-		newCertificate = Certificate(name=globalVs.CertiName[self.name], issuer = self.name, receiver=Upubkey, fields = fields)
+		newCertificate = Certificate(name=globalVs.CertiName[self.name], issuer = self.name, receiver=receiver, fields = fields)
 		# Insert into bloackchain, return the address
 
 		newCertificate.makeMerkleTree()
 		address = newCertificate.uploadMerkleSignature()
+
+		return construct_cert_str(name = newCertificate.name, receiver = receiver, attr = fields,address=address)
 		
 
 
