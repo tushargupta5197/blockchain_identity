@@ -1,6 +1,12 @@
+from ruamel.yaml import YAML
+
 def init():
+
+	global yaml
+	yaml = YAML()
+
 	global issuers
-	issuers = ['SBI bank', 'ABC University', 'XYZ Company']
+	issuers = ['SBI Bank', 'ABC University', 'XYZ Company']
 
 	global users
 	users = ['alice']
@@ -9,7 +15,7 @@ def init():
 	CertiName = {
 		'ABC University' : 'transcript',
 		'XYZ Company' : 'job_application',
-		'SBI bank' : 'loan',
+		'SBI Bank' : 'loan',
 	}
 
 	global merkle_signatures

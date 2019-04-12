@@ -1,5 +1,4 @@
 import rsa
-import yaml
 from merkletools import *
 from hashlib import sha256
 import globalVs
@@ -15,15 +14,15 @@ class Issuer:
 			self.keypair = keypair
 		globalVs.public_keys[self.name] = self.keypair[0]
 
-		self.schema = yaml.load(open(schema))
+		self.schema = globalVs.yaml.load(open(schema))
 
 	def verify_field(self, key, value, signature, root, proof, pkey):
-		print(key, value)	
 		mt = MerkleTools()
 		root_verified = mt.validate_proof(proof, sha256(str(key)+':'+str(value)).hexdigest(), root)
 		if not root_verified:
 			print("Incorrect Merkle Root")
 			return False
+
 
 		try:
 			rsa.verify(root, signature, pkey)
@@ -59,8 +58,7 @@ class Issuer:
 				if attr not in proofs:
 					print("Proof not provided: "+attr)
 					return False
-				# proof_issuer = self.schema['Verifiable'][attr]
-				print(self.schema)
+
 				if(not self.verify_field(key = attr, 
 									value = values[attr], 
 									signature = globalVs.merkle_signatures[int(proofs[attr]['address'])], 
@@ -79,12 +77,11 @@ class Issuer:
 			else:
 				fields[attr]=str(1)#raw_input(attr+': ') #Will be replaced with random quantity
 
-
 		newCertificate = Certificate(name=globalVs.CertiName[self.name], issuer = self.name, receiver=receiver, fields = fields)
 		# Insert into blockchain, return the address
 
 		newCertificate.makeMerkleTree()
-		address = newCertificate.uploadMerkleSignature(self.keypair[1])
+		address = newCertificate.uploadMerkleSignature(self.keypair[1], self.keypair[0])
 
 		return self.certi_to_string(name = newCertificate.name, receiver = receiver, attr = fields, address=address)
 		

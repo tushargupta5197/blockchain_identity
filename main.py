@@ -7,6 +7,7 @@ import Certificate
 from User import User
 
 
+
 globalVs.init()
 
 alice = User(name='alice', wallet_file='wallet.yaml')
@@ -17,7 +18,7 @@ abc_univ = Issuer(name='ABC University', schema='schemas/'+globalVs.CertiName['A
 xyz_company = Issuer(name='XYZ Company', schema='schemas/'+globalVs.CertiName['XYZ Company'] + '.yaml')
 
 
-bank = Issuer(name='SBI bank', schema='schemas/'+globalVs.CertiName['SBI bank'] + '.yaml')
+bank = Issuer(name='SBI Bank', schema='schemas/'+globalVs.CertiName['SBI Bank'] + '.yaml')
 
 
 values={
@@ -41,3 +42,13 @@ values={
 }
 
 alice.requestCertificate(issuer = 'XYZ Company', values=values, issuer_obj=xyz_company)
+
+values = {
+	'first_name' : 'alice',
+	'last_name': 'garcia',
+	'phone_number': 0612,
+	'ssn' : 150035, 
+	'salary' : '1' 
+}
+
+alice.requestCertificate(issuer = 'SBI Bank', values=values, issuer_obj=bank)

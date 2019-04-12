@@ -1,6 +1,5 @@
 import rsa
 import globalVs
-import yaml
 import json
 from Certificate import Certificate
 
@@ -11,7 +10,7 @@ class User:
 	def __init__(self, name = None, wallet_file = None, keypair = None):
 		self.name = name
 		self.wallet_file = wallet_file
-		self.wallet = yaml.load(open(wallet_file, 'w+'))
+		self.wallet = globalVs.yaml.load(open(wallet_file, 'w+'))
 		if(self.wallet == None):
 			self.wallet = {}
 		if keypair == None:
@@ -21,7 +20,7 @@ class User:
 
 
 	def requestCertificate(self, issuer, values = None, issuer_obj=None):
-		schema = yaml.load(open('schemas/' + globalVs.CertiName[issuer]+'.yaml'))
+		schema = globalVs.yaml.load(open('schemas/' + globalVs.CertiName[issuer]+'.yaml'))
 		proof_req = schema['Proof_Request']
 		verifiable = schema['Verifiable']
 
@@ -45,12 +44,9 @@ class User:
 
 				proof[verifiable_attr] = attr_proof
 
-		print(proof)
 		cert_str = issuer_obj.issue(proof, values, self.name)
 		if( cert_str != False):
-			print(cert_str)
 			cert_dic = json.loads(cert_str)
-			# print(cert_dic)
 			cert_filename = 'certificates/'+cert_dic['Name']+'.yaml'
 			self.wallet[cert_dic['Name']] = cert_filename
 
