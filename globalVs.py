@@ -1,29 +1,25 @@
 from ruamel.yaml import YAML
+yaml = YAML()
 
-def init():
+globalVs = {}
 
-	global yaml
-	yaml = YAML()
-
-	global issuers
-	issuers = ['SBI Bank', 'ABC University', 'XYZ Company']
-
-	global users
-	users = ['alice']
-
-	global CertiName
-	CertiName = {
-		'ABC University' : 'transcript',
-		'XYZ Company' : 'job_application',
-		'SBI Bank' : 'loan',
-	}
-
-	global merkle_signatures
-	merkle_signatures = []
-
-	global public_keys
-	public_keys = {}
+url = {'SBI Bank':'http://localhost:8082/', 'ABC University':'http://localhost:8080/', 'XYZ Company':'http://localhost:8081/'}
 
 
-def save():
-	pass
+CertiName = {
+	'ABC University' : 'transcript',
+	'XYZ Company' : 'job_application',
+	'SBI Bank' : 'loan',
+}
+
+merkle_signatures = []
+
+globalVs['url'] = url
+globalVs['CertiName'] = CertiName
+globalVs['merkle_signatures'] = merkle_signatures
+
+# pkl.dump(globalVs, open('globalVs', 'w'))
+
+with open('globalVs.yaml', 'w') as outfile:
+    yaml.dump(globalVs, outfile)
+

@@ -1,9 +1,9 @@
 import rsa
 from merkletools import *
 import datetime
-import globalVs
-
-
+from ruamel.yaml import YAML
+import json
+from base64 import b64encode
 
 class Certificate:
 	def __init__(self, name=None, issuer=None, receiver=None, fields=None, address = 0x0):
@@ -15,13 +15,20 @@ class Certificate:
 		self.address = address
 		self.merkleTree = None
 		self.merkleSigAdd = None
+		self.yaml = YAML()
 
 		if fields:
 			for key in fields:
 				self.fields_list.append(str(key) + ':' + str(self.fields[key]))
+		self.fields_list.sort()
+
 
 	def load_from_file(self, filename):
-		cert = globalVs.yaml.load(open(filename))
+		try:
+			cert = self.yaml.load(open(filename))
+		except:
+			print("Can't open file {} for opening".format(filename))
+			return False
 		self.name = cert['Name']
 		self.issuer = cert['Issuer']
 		self.receiver = cert['Receiver']
@@ -34,6 +41,9 @@ class Certificate:
 		if self.fields:
 			for key in self.fields:
 				self.fields_list.append(str(key) + ':' + str(self.fields[key]))
+		self.fields_list.sort()
+
+		return True
 
 	def makeMerkleTree(self):
 		self.merkleTree = MerkleTools()
@@ -46,19 +56,37 @@ class Certificate:
 
 	def getMerkleLeaf(self, key, value):
 		statement = str(key)+':'+str(value)
-		index = self.fields_list.index(statement)
+		try:
+			index = self.fields_list.index(statement)
+		except:
+			return -1
 		return self.merkleTree.get_leaf(index)
 
 	def getMerkleProof(self, key, value):
 		statement = str(key)+':'+str(value)
-		index = self.fields_list.index(statement)
+		try:
+			index = self.fields_list.index(statement)
+		except:
+			return -1
 		return self.merkleTree.get_proof(index)
 
 	def uploadMerkleSignature(self, issuer_skey, pkey):
+		try:
+			globalVs = self.yaml.load(open('globalVs.yaml'))
+		except:
+			print("Can't open globalVs file")
+			return -1
 		root = self.getMerkleRoot()
-		encrypted_root = rsa.sign(root, issuer_skey, 'SHA-256')
-		globalVs.merkle_signatures.append(encrypted_root)
-		return globalVs.merkle_signatures.index(encrypted_root)
+
+		try:
+			encrypted_root = b64encode(rsa.sign(root, issuer_skey, 'SHA-256'))
+			globalVs['merkle_signatures'].append(encrypted_root)
+			with open('globalVs.yaml','w') as f:
+				f.write(json.dumps(globalVs, ensure_ascii=False))
+		except:
+			return -1
+
+		return globalVs['merkle_signatures'].index(encrypted_root)
 
 
 	def verifySignature(self, root, pkey, encrypted):
