@@ -13,7 +13,9 @@ abc_univ = Issuer(name='ABC University', schema='schemas/transcript.yaml', cert_
 
 @app.route("/")
 def hello():
-	return "<b> Page of ABC University </b>"
+	with open("servers/company.html", 'r') as f:
+		return f.read().format("ABC University", "<p>Pass your courses :)</p>", "8080")
+
 
 @app.route("/pkey")
 def get_pkey():

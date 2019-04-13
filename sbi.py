@@ -13,7 +13,9 @@ sbi_bank = Issuer(name='SBI Bank', schema='schemas/loan.yaml', cert_name = 'loan
 
 @app.route("/")
 def hello():
-	return "<b> Page of SBI Bank </b>"
+	with open("servers/company.html", 'r') as f:
+		return f.read().format("SBI Bank", "<p>Salary : >1000</p><p>ssn : exists</p>", "8082")
+
 
 @app.route("/pkey")
 def get_pkey():

@@ -13,7 +13,8 @@ xyz_company = Issuer(name='XYZ Company', schema='schemas/job_application.yaml', 
 
 @app.route("/")
 def hello():
-	return "<b> Page of XYZ Company </b>"
+	with open("servers/company.html", 'r') as f:
+		return f.read().format("XYZ Company", "<p>Degree : BTech</p><p>Status : Graduated</p>", "8081")
 
 @app.route("/pkey")
 def get_pkey():
