@@ -19,7 +19,7 @@ alice.requestCertificate(issuer = 'ABC University', values=values)
 values={
 	'first_name' : 'Alice',
 	'last_name': 'Garcia',
-	'phone_number': 0612,
+	'phone_number': 1,
 	'ssn' : 150035, 
 	'degree': 'Btech',
 	'status' : 'graduated' 
@@ -30,7 +30,7 @@ alice.requestCertificate(issuer = 'XYZ Company', values=values)
 values = {
 	'first_name' : 'Alice',
 	'last_name': 'Garcia',
-	'phone_number': 0612,
+	'phone_number': 1,
 	'ssn' : 150035, 
 	'salary' : 1
 }

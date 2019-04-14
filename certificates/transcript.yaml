@@ -1,1 +1,1 @@
-{"Attributes": {"status": "graduated", "first_name": "Alice", "last_name": "Garcia", "degree": "Btech", "ssn": 150035, "year": 2015}, "Receiver": "Alice Garcia", "Issuer": "ABC University", "Name": "transcript", "Address": 12}
+{"Address": "0x616b2042c339988A36463583b6250903f30fFebF", "Attributes": {"degree": "Btech", "first_name": "Alice", "last_name": "Garcia", "ssn": 150035, "status": "graduated", "year": 2015}, "Issuer": "ABC University", "Name": "transcript", "Receiver": "Alice Garcia"}

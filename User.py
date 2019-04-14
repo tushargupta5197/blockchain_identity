@@ -2,17 +2,16 @@ import rsa
 import json
 from Certificate import Certificate
 import requests
-from ruamel.yaml import YAML
+import yaml
 from Issuer import Issuer
 
 
 class User:
 	def __init__(self, name = None, wallet_file = None, keypair = None):
-		self.yaml=YAML()
 
 		self.name = name
 		self.wallet_file = wallet_file
-		self.wallet = self.yaml.load(open(wallet_file, 'w+'))
+		self.wallet = yaml.load(open(wallet_file, 'w+'))
 		if(self.wallet == None):
 			self.wallet = {}
 		if keypair == None:
@@ -22,7 +21,7 @@ class User:
 
 
 	def requestCertificate(self, issuer, values = None):
-		globalVs = self.yaml.load(open('globalVs.yaml'))
+		globalVs = yaml.load(open('globalVs.yaml'))
 
 		schema = requests.get(globalVs['url'][issuer]+'cert_schema')
 		if schema.status_code < 300:
@@ -96,7 +95,7 @@ class User:
 
 			with open(self.wallet_file, 'w') as f:
 				f.write(json.dumps(self.wallet))
-
+			print(cert_filename + " Acquired")
 		else:
 			print ("Failed to get certificate: ", certificate_requested)
 

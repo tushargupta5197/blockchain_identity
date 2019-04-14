@@ -1,12 +1,12 @@
 import rsa
 from merkletools import *
 import datetime
-from ruamel.yaml import YAML
+import yaml
 import json
-from base64 import b64encode
-
+from base64 import b64encode, b64decode
+from upload import Maker
 class Certificate:
-	def __init__(self, name=None, issuer=None, receiver=None, fields=None, address = 0x0):
+	def __init__(self, name=None, issuer=None, receiver=None, fields=None, address = 0x0, maker=None):
 		self.name = name
 		self.issuer = issuer
 		self.receiver = receiver
@@ -15,17 +15,17 @@ class Certificate:
 		self.address = address
 		self.merkleTree = None
 		self.merkleSigAdd = None
-		self.yaml = YAML()
 
 		if fields:
 			for key in fields:
 				self.fields_list.append(str(key) + ':' + str(self.fields[key]))
 		self.fields_list.sort()
 
+		self.maker = maker
 
 	def load_from_file(self, filename):
 		try:
-			cert = self.yaml.load(open(filename))
+			cert = yaml.load(open(filename))
 		except:
 			print("Can't open file {} for opening".format(filename))
 			return False
@@ -71,22 +71,25 @@ class Certificate:
 		return self.merkleTree.get_proof(index)
 
 	def uploadMerkleSignature(self, issuer_skey, pkey):
-		try:
-			globalVs = self.yaml.load(open('globalVs.yaml'))
-		except:
-			print("Can't open globalVs file")
-			return -1
+		# try:
+		# 	globalVs = self.yaml.load(open('globalVs.yaml'))
+		# except:
+		# 	print("Can't open globalVs file")
+		# 	return -1
+
 		root = self.getMerkleRoot()
+		
+		encrypted_root = b64encode(rsa.sign(root.encode('utf-8'), issuer_skey, 'SHA-256'))
+		# globalVs['merkle_signatures'].append(encrypted_root)
+		addr = self.maker.issueCertificate(encrypted_root)
+		# 	with open('globalVs.yaml','w') as f:
+		# 		f.write(json.dumps(globalVs, ensure_ascii=False))
+		# except:
+		# 	return -1
 
-		try:
-			encrypted_root = b64encode(rsa.sign(root, issuer_skey, 'SHA-256'))
-			globalVs['merkle_signatures'].append(encrypted_root)
-			with open('globalVs.yaml','w') as f:
-				f.write(json.dumps(globalVs, ensure_ascii=False))
-		except:
-			return -1
+		# return globalVs['merkle_signatures'].index(encrypted_root)
+		return addr
 
-		return globalVs['merkle_signatures'].index(encrypted_root)
 
 
 	def verifySignature(self, root, pkey, encrypted):

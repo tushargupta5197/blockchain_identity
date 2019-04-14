@@ -3,10 +3,10 @@ from merkletools import *
 from hashlib import sha256
 import json
 from Certificate import Certificate
-from ruamel.yaml import YAML
+import yaml
 from base64 import b64decode
 import requests
-
+from upload import Maker
 
 class Issuer:
 	def __init__(self, name = None, keypair = None, schema = None, cert_name = None):
@@ -15,20 +15,24 @@ class Issuer:
 			self.keypair = rsa.newkeys(1024)
 		else:
 			self.keypair = keypair
-		self.yaml = YAML()
 
 		self.cert_name = cert_name
-		self.schema = self.yaml.load(open(schema))
+		self.schema = yaml.load(open(schema))
 
 	def verify_field(self, key, value, signature, root, proof, pkey):
 		mt = MerkleTools()
-		root_verified = mt.validate_proof(proof, sha256(str(key)+':'+str(value)).hexdigest(), root)
+		val = str(key)+':'+str(value)
+		val =val.encode('utf-8')
+		root_verified = mt.validate_proof(proof, sha256(val).hexdigest(), root)
 		if not root_verified:
 			print("Incorrect Merkle Root")
 			return False
 
 		try:
-			rsa.verify(root, b64decode(signature), pkey)
+			print(root)
+			print(signature)
+
+			rsa.verify(root.encode('utf-8'), b64decode(signature), pkey)
 			return True
 		except:
 			print("Signature mismatch")
@@ -48,16 +52,16 @@ class Issuer:
 			}
 		)
 
-	def issue(self, proofs, values, receiver):
+	def issue(self, proofs, values, receiver, maker_addr):
 
-		globalVs = self.yaml.load(open('globalVs.yaml'))
+		globalVs = yaml.load(open('globalVs.yaml'))
 		
 		if self.schema['Proof_Request']:
 			for attr in self.schema['Proof_Request']:
 				if attr not in values:
 					print("Value not provided: "+attr)
 					return '{'+'}'
-
+		maker = Maker(maker_addr)
 		if self.schema['Verifiable']:
 			for attr in self.schema['Verifiable'].keys():
 				if attr not in proofs:
@@ -65,10 +69,12 @@ class Issuer:
 					return '{'+'}'
 
 				response = requests.get(globalVs['url'][self.schema['Verifiable'][attr]]+'pkey')
-
+				addr = proofs[attr]['address']
+				
+				sig = maker.getHash(addr)
 				if(not self.verify_field(key = attr, 
 									value = values[attr], 
-									signature = globalVs['merkle_signatures'][int(proofs[attr]['address'])], 
+									signature = sig, 
 									root = proofs[attr]['root'], 
 									proof = proofs[attr]['proof'],
 									pkey = rsa.PublicKey.load_pkcs1(response.json()['pkey'])
@@ -84,7 +90,7 @@ class Issuer:
 			else:
 				fields[attr]=str(1)#raw_input(attr+': ') #Will be replaced with random quantity
 
-		newCertificate = Certificate(name=self.cert_name, issuer = self.name, receiver=receiver, fields = fields)
+		newCertificate = Certificate(name=self.cert_name, issuer = self.name, receiver=receiver, fields = fields, maker=maker)
 		# Insert into blockchain, return the address
 
 		newCertificate.makeMerkleTree()

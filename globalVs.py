@@ -1,6 +1,4 @@
-from ruamel.yaml import YAML
-yaml = YAML()
-
+import yaml
 globalVs = {}
 
 url = {'SBI Bank':'http://localhost:8082/', 'ABC University':'http://localhost:8080/', 'XYZ Company':'http://localhost:8081/'}

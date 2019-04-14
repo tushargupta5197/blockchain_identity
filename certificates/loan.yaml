@@ -1,1 +1,1 @@
-{"Attributes": {"loan_amt": "1", "first_name": "Alice", "last_name": "Garcia"}, "Receiver": "Alice Garcia", "Issuer": "SBI Bank", "Name": "loan", "Address": 14}
+{"Address": "0x00E3324F97abdd7172ACdc491024f3ae73dcfe00", "Attributes": {"first_name": "Alice", "last_name": "Garcia", "loan_amt": "1"}, "Issuer": "SBI Bank", "Name": "loan", "Receiver": "Alice Garcia"}
