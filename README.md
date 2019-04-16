@@ -72,6 +72,21 @@ To open the command line interface of user ``python3 cli.py``
 
 ### Server
 
-To open the command line interface of user 1``python3 cli.py``
+To open the command line interface of user 1``python3 issuer_cli.py``
 
++ To setup a Issuer : use `setup issuer` and enter the data - 
+```
+# DIMS> setup issuer
+Enter Name: SBI Bank
+Enter your port number: 8082
+Enter your certificate name: loan
+Enter database_name: sbi
+Enter your requirements, and type 'done' when done:
+Salary>10000
+Requirement added: Salary>10000
+
+Execute: python3 generated_SBI_Bank.py in future to run your Flask server
+# SBI Bank> setup server
+STARTING SERVER...
+```
 
