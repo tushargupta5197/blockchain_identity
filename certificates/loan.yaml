@@ -1,1 +1,1 @@
-{"Address": "0x00E3324F97abdd7172ACdc491024f3ae73dcfe00", "Attributes": {"first_name": "Alice", "last_name": "Garcia", "loan_amt": "1"}, "Issuer": "SBI Bank", "Name": "loan", "Receiver": "Alice Garcia"}
+{"Address": "0x8c40525ED56E32dEC520af546581bFF10BA53576", "Attributes": {"first_name": "Alice Garcia", "last_name": "Garcia", "loan_amt": 100000, "nonce": "0x787c2b64f2830caf6dfdc0d9c219f60a2be37e96ba32cb6ec3ae8974da51cd99"}, "Issuer": "SBI Bank", "Name": "loan", "Receiver": "Alice Garcia"}

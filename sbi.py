@@ -7,9 +7,29 @@ sys.path.append('../')
 from Issuer import Issuer 
 import json
 
+import sqlite3
+
+conn = sqlite3.connect("GlobalVs.db")
+c = conn.cursor()
+
+query = """INSERT INTO GlobalVs VALUES ( '{}', '{}', '{}') ;""".format('SBI Bank', 'http://localhost:8082/', 'loan')
+print(query)
+try:
+	c.execute(query)
+	conn.commit()
+except:
+	print("Not inserted")
+
+
 app = Flask(__name__)
 
-sbi_bank = Issuer(name='SBI Bank', schema='schemas/loan.yaml', cert_name = 'loan')
+
+database = {121001: {"first_name": "Alice", "last_name": "Garcia", "loan_amt":100000},
+			121002: {"first_name": "Bob", "last_name": "Marley", "loan_amt":200000}}
+
+
+
+sbi_bank = Issuer(name='SBI Bank', schema='schemas/loan.yaml', cert_name = 'loan', db=database)
 
 @app.route("/")
 def hello():
@@ -38,8 +58,9 @@ def issue():
 	proofs = request.json['proofs']
 	values = request.json['values']
 	receiver = request.json['receiver']
+	recv_ssn = request.json['recv_ssn']
 	maker_addr = '0x9e7cd1df366a5d315e0f42d3d3e3100943281cb0'
-	response = json.loads(sbi_bank.issue(proofs = proofs, values = values, receiver = receiver, maker_addr=maker_addr))
+	response = json.loads(sbi_bank.issue(proofs = proofs, values = values, receiver = receiver, maker_addr=maker_addr , recv_ssn = recv_ssn))
 
 	return jsonify(response),201
 

@@ -4,14 +4,19 @@ from Certificate import Certificate
 import requests
 import yaml
 from Issuer import Issuer
-
+import sqlite3
+from contextlib import closing
 
 class User:
-	def __init__(self, name = None, wallet_file = None, keypair = None):
+	def __init__(self, name = None, ssn=None, wallet_file = None, keypair = None):
 
 		self.name = name
 		self.wallet_file = wallet_file
-		self.wallet = yaml.load(open(wallet_file, 'w+'))
+		self.ssn = ssn
+		try:
+			self.wallet = yaml.load(open(wallet_file, 'r+'))
+		except Exception as e:
+			self.wallet = {}
 		if(self.wallet == None):
 			self.wallet = {}
 		if keypair == None:
@@ -21,9 +26,20 @@ class User:
 
 
 	def requestCertificate(self, issuer, values = None):
-		globalVs = yaml.load(open('globalVs.yaml'))
+		# globalVs = yaml.load(open('globalVs.yaml'))
 
-		schema = requests.get(globalVs['url'][issuer]+'cert_schema')
+		# conn = sqlite3.connect('GlobalVs.db')
+		# c = conn.cursor()
+
+		with closing(sqlite3.connect('GlobalVs.db')) as con, con, closing(con.cursor()) as c:
+			query = """SELECT url FROM GlobalVs WHERE InstituteName = '{}';""".format(issuer)
+			c.execute(query)
+			result = c.fetchall()
+			url = result[0][0]
+		print(url)
+		print(result)
+
+		schema = requests.get(url+'cert_schema')
 		if schema.status_code < 300:
 			schema = schema.json()
 		else:
@@ -31,7 +47,7 @@ class User:
 			print("Aborting....")
 			return 
 
-		certificate_requested = requests.get(globalVs['url'][issuer]+'cert_name')
+		certificate_requested = requests.get(url+'cert_name')
 
 		if certificate_requested.status_code < 300:
 			certificate_requested = certificate_requested.json()['cert_name']
@@ -47,7 +63,14 @@ class User:
 		if verifiable:
 			for verifiable_attr in verifiable:
 				proof_issuer = verifiable[verifiable_attr]
-				cert_name = requests.get(globalVs['url'][proof_issuer]+'cert_name')
+				with closing(sqlite3.connect('GlobalVs.db')) as con, con, closing(con.cursor()) as c:
+					query = """SELECT url FROM GlobalVs WHERE InstituteName = '{}';""".format(proof_issuer)
+					# c = conn.cursor()
+					c.execute(query)
+					result = c.fetchall()
+					is_url = result[0][0]
+				print(is_url)
+				cert_name = requests.get(is_url+'cert_name')
 				if cert_name.status_code<300:
 					cert_name = cert_name.json()['cert_name']
 				else:
@@ -83,7 +106,7 @@ class User:
 				attr_proof['root'] = cert_root
 
 				proof[verifiable_attr] = attr_proof
-		response = requests.post(globalVs['url'][issuer]+'get_cert',json = {"proofs":proof, "values":values, "receiver":self.name})
+		response = requests.post(url+'get_cert',json = {"proofs":proof, "values":values, "receiver":self.name, "recv_ssn":self.ssn})
 
 		if( response.status_code < 300):
 			cert_dic = response.json()
@@ -92,9 +115,11 @@ class User:
 
 			with open(cert_filename, 'w') as f:
 				f.write(json.dumps(cert_dic))
+				f.close()
 
 			with open(self.wallet_file, 'w') as f:
 				f.write(json.dumps(self.wallet))
+				f.close()
 			print(cert_filename + " Acquired")
 		else:
 			print ("Failed to get certificate: ", certificate_requested)

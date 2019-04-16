@@ -7,9 +7,13 @@ import yaml
 from base64 import b64decode
 import requests
 from upload import Maker
+import random
+import sqlite3
+from contextlib import closing
+
 
 class Issuer:
-	def __init__(self, name = None, keypair = None, schema = None, cert_name = None):
+	def __init__(self, name = None, keypair = None, schema = None, cert_name = None, db=None):
 		self.name = name
 		if keypair == None:
 			self.keypair = rsa.newkeys(1024)
@@ -18,6 +22,7 @@ class Issuer:
 
 		self.cert_name = cert_name
 		self.schema = yaml.load(open(schema))
+		self.db = db
 
 	def verify_field(self, key, value, signature, root, proof, pkey):
 		mt = MerkleTools()
@@ -52,9 +57,12 @@ class Issuer:
 			}
 		)
 
-	def issue(self, proofs, values, receiver, maker_addr):
+	def issue(self, proofs, values, receiver, maker_addr, recv_ssn):
 
-		globalVs = yaml.load(open('globalVs.yaml'))
+		# globalVs = yaml.load(open('globalVs.yaml'))
+		# conn = sqlite3.connect('GlobalVs.db')
+		# c = conn.cursor()
+
 		
 		if self.schema['Proof_Request']:
 			for attr in self.schema['Proof_Request']:
@@ -67,8 +75,14 @@ class Issuer:
 				if attr not in proofs:
 					print("Proof not provided: "+attr)
 					return '{'+'}'
-
-				response = requests.get(globalVs['url'][self.schema['Verifiable'][attr]]+'pkey')
+				with closing(sqlite3.connect('GlobalVs.db')) as con, con, closing(con.cursor()) as c:
+					query = """SELECT url FROM GlobalVs WHERE InstituteName = '{}';""".format(self.schema['Verifiable'][attr])
+					# c = conn.cursor()
+					c.execute(query)
+					result = c.fetchall()
+					url = result[0][0]
+				print(result)
+				response = requests.get(url+'pkey')
 				addr = proofs[attr]['address']
 				
 				sig = maker.getHash(addr)
@@ -85,10 +99,13 @@ class Issuer:
 
 		fields = {}
 		for attr in self.schema['Attributes']:
-			if attr in values:
+			if attr == 'ssn':
+				fields[attr] = recv_ssn
+			elif attr in values:
 				fields[attr]=values[attr]
 			else:
-				fields[attr]=str(1)#raw_input(attr+': ') #Will be replaced with random quantity
+				fields[attr]=self.db[recv_ssn][attr]
+			fields['nonce'] = hex(random.getrandbits(256))
 
 		newCertificate = Certificate(name=self.cert_name, issuer = self.name, receiver=receiver, fields = fields, maker=maker)
 		# Insert into blockchain, return the address

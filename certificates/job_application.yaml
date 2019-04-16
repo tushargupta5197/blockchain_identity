@@ -1,1 +1,1 @@
-{"Address": "0x36fa9441611c71Cb051440b7aD7aA21F8d3eB0fB", "Attributes": {"employee_status": "1", "first_name": "Alice", "last_name": "Garcia", "salary": "1"}, "Issuer": "XYZ Company", "Name": "job_application", "Receiver": "Alice Garcia"}
+{"Address": "0x00d4d51B41363bC4931BA25De1C1bFa2A5C442f0", "Attributes": {"employee_status": "Accountant", "first_name": "Alice", "last_name": "Garcia", "nonce": "0x357b31fcb35c6793e2446046a27880a5bab8ab488ff74ea74f60c35aab640d79", "salary": 5000}, "Issuer": "XYZ Company", "Name": "job_application", "Receiver": "Alice Garcia"}

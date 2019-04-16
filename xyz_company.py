@@ -7,9 +7,26 @@ sys.path.append('../')
 from Issuer import Issuer 
 import json
 
+import sqlite3
+
+conn = sqlite3.connect("GlobalVs.db")
+c = conn.cursor()
+
+query = """INSERT INTO GlobalVs VALUES ( '{}', '{}', '{}') ;""".format('XYZ Company', 'http://localhost:8081/', 'job_application')
+print(query)
+try:
+	c.execute(query)
+	conn.commit()
+except:
+	pass
+
+
 app = Flask(__name__)
 
-xyz_company = Issuer(name='XYZ Company', schema='schemas/job_application.yaml', cert_name = 'job_application')
+database = {121001: {"first_name": "Alice", "last_name": "Garcia", "employee_status":"Accountant","salary":5000},
+			121002: {"first_name": "Bob", "last_name": "Marley", "employee_status":"Manager", "salary":15000}}
+
+xyz_company = Issuer(name='XYZ Company', schema='schemas/job_application.yaml', cert_name = 'job_application', db = database)
 
 @app.route("/")
 def hello():
@@ -37,8 +54,9 @@ def issue():
 	proofs = request.json['proofs']
 	values = request.json['values']
 	receiver = request.json['receiver']
+	recv_ssn = request.json['recv_ssn']
 	maker_addr = '0x9e7cd1df366a5d315e0f42d3d3e3100943281cb0'
-	response = json.loads(xyz_company.issue(proofs = proofs, values = values, receiver = receiver, maker_addr = maker_addr))
+	response = json.loads(xyz_company.issue(proofs = proofs, values = values, receiver = receiver, maker_addr = maker_addr, recv_ssn = recv_ssn))
 
 	return jsonify(response),201
 
