@@ -21,12 +21,13 @@ To open the command line interface of user ``python3 cli.py``
   # Alice> display wallet
   ```
 + Since we do not have any certificates yet, the wallet is empty. Let's get some certificates now.
+
 + To setup the issuer from whom you want the certificate, use `set issuer`:
   ```
   # Alice> set issuer
   Enter the issuer from which you want a certificate: ABC University
   ```
-  This will show the issuer details such as url, certificate schema, etc. if successful.
+  This will show the issuer details such as url, certificate schema, etc. if successful and create certificate for <b>ABC University</b>.
 + Now, you can view various details of the certificate issued by the company such as name or public key as:
 ```
 # Alice> get certificate name
@@ -42,7 +43,7 @@ To open the command line interface of user ``python3 cli.py``
   # Alice> show wallet
   ```
   to view your newly obtained certificate!
-+ Now we will use our newly obtained transcript from ABC University to apply for a job. Execute:
++ Now we will use our newly obtained transcript from ABC University to apply for a job in <b>XYZ Company</b>. Execute:
   ```
   # Alice> set issuer
   Enter the issuer from which you want a certificate: XYZ Company
@@ -51,7 +52,7 @@ To open the command line interface of user ``python3 cli.py``
   ```
   You will be asked for various data needed by the company, some of which (marked as V) will be verified from the transcript. DIMS will automatically make a proof ensuring that only the fields required by the company are exposed and other fields are still private.
   
-+ Again, we can use both of our certificates to get a loan certificate from the SBI Bank. Execute the following:
++ Again, we can use both of our certificates to get a loan certificate from the <b>SBI Bank</b>. Execute the following:
   ```
   # Alice> set issuer
   Enter the issuer from which you want a certificate: SBI Bank
