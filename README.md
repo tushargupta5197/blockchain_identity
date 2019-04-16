@@ -85,7 +85,7 @@ Enter your requirements, and type 'done' when done:
 Salary>10000
 Requirement added: Salary>10000
 
-Execute: python3 generated_SBI_Bank.py in future to run your Flassk server
+Execute: python3 generated_SBI_Bank.py in future to run your Flask server
 # SBI Bank> setup server
 STARTING SERVER...
 ```
